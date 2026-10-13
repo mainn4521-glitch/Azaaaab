@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Humanities & Critical Thinking — Practice Test</title>
+<style>
+  :root{
+    --bg:#0f172a;
+    --card:#ffffff;
+    --accent:#2563eb;
+    --accent-dark:#1d4ed8;
+    --text:#1e293b;
+    --muted:#64748b;
+    --danger:#dc2626;
+    --good:#16a34a;
+    --border:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:linear-gradient(180deg,#0f172a 0%,#1e293b 100%);
+    min-height:100vh;
+    color:var(--text);
+    padding-top:68px;
+  }
+
+  /* Fixed timer bar - always visible on every screen, regardless of scroll */
+  #timerBar{
+    position:fixed;
+    top:0; left:0; right:0;
+    height:56px;
+    background:#0f172a;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    z-index:1000;
+    box-shadow:0 2px 10px rgba(0,0,0,0.3);
+    font-weight:700;
+    letter-spacing:0.5px;
+    transition:box-shadow 0.3s;
+  }
+  #timerBar .clockIcon{
+    font-size:18px;
+    display:inline-block;
+    animation: swing 1.1s ease-in-out infinite;
+    transform-origin:50% 15%;
+  }
+  @keyframes swing{
+    0%,100%{ transform:rotate(-14deg); }
+    50%{ transform:rotate(14deg); }
+  }
+  #timerBar #timeLeft{
+    display:inline-block;
+    animation: pulseText 1s ease-in-out infinite;
+  }
+  @keyframes pulseText{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.72; }
+  }
+  #timerBar.danger{
+    animation: pulseBar 0.9s infinite;
+  }
+  @keyframes pulseBar{
+    0%,100%{ box-shadow:0 2px 10px rgba(0,0,0,0.3); }
+    50%{ box-shadow:0 2px 22px rgba(239,68,68,0.85); }
+  }
+  #timerProgressOuter{
+    position:fixed;
+    top:56px; left:0; right:0;
+    height:4px;
+    background:rgba(255,255,255,0.15);
+    z-index:999;
+    overflow:hidden;
+  }
+  #timerProgressInner{
+    height:100%;
+    width:100%;
+    background:linear-gradient(90deg,#2563eb,#60a5fa,#2563eb);
+    background-size:200% 100%;
+    animation: shimmer 2.2s linear infinite;
+    transition:width 1s linear, background 0.3s;
+  }
+  @keyframes shimmer{
+    0%{ background-position:0% 0%; }
+    100%{ background-position:200% 0%; }
+  }
+  #timerBar.warn #timerProgressInner{ background:linear-gradient(90deg,#f97316,#fdba74,#f97316); background-size:200% 100%; }
+  #timerBar.danger #timerProgressInner{ background:linear-gradient(90deg,#ef4444,#fca5a5,#ef4444); background-size:200% 100%; }
+  #timerBar #timeLeft{
+    font-size:20px;
+    font-variant-numeric:tabular-nums;
+  }
+  #timerBar.warn{ background:#7c2d12; }
+  #timerBar.danger{ background:#7f1d1d; }
+
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:20px 16px 60px;
+  }
+
+  /* Start screen */
+  .startCard, .resultCard{
+    background:var(--card);
+    border-radius:16px;
+    padding:32px 24px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    text-align:center;
+    margin-top:40px;
+  }
+  .startCard h1, .resultCard h1{
+    font-size:22px;
+    margin:0 0 12px;
+    color:var(--text);
+  }
+  .startCard p{
+    color:var(--muted);
+    font-size:15px;
+    line-height:1.6;
+    margin:0 0 24px;
+  }
+  .startCard ul{
+    text-align:left;
+    color:var(--text);
+    font-size:14px;
+    line-height:1.9;
+    background:#f1f5f9;
+    border-radius:10px;
+    padding:16px 20px;
+    margin:0 0 24px;
+  }
+
+  .resumeBox{
+    background:#eff6ff;
+    border:2px dashed var(--accent);
+    border-radius:12px;
+    padding:16px;
+    margin-bottom:20px;
+    text-align:center;
+  }
+  .resumeBox .resumeText{
+    font-size:14px;
+    color:var(--text);
+    font-weight:600;
+    margin-bottom:12px;
+  }
+  .resumeBox button{
+    margin-bottom:8px;
+  }
+  .resumeBox button:last-child{
+    margin-bottom:0;
+  }
+
+  button.primary{
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:16px 28px;
+    font-size:17px;
+    font-weight:700;
+    cursor:pointer;
+    width:100%;
+    transition:background 0.15s;
+  }
+  button.primary:active{ background:var(--accent-dark); }
+  button.primary:disabled{
+    background:#94a3b8;
+    cursor:not-allowed;
+  }
+
+  button.secondary{
+    background:transparent;
+    color:var(--accent);
+    border:2px solid var(--accent);
+    border-radius:12px;
+    padding:14px 28px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    width:100%;
+    margin-top:12px;
+  }
+
+  /* Question card */
+  .qCard{
+    background:var(--card);
+    border-radius:16px;
+    padding:22px 20px 24px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    margin-top:16px;
+    margin-bottom:16px;
+  }
+  .navRowSticky{
+    position:sticky;
+    bottom:0;
+    background:transparent;
+    padding-top:4px;
+    padding-bottom:10px;
+  }
+  .progress{
+    color:#cbd5e1;
+    font-size:13px;
+    text-align:center;
+    margin-bottom:10px;
+    font-weight:600;
+  }
+  .progressBarOuter{
+    height:6px;
+    background:#334155;
+    border-radius:4px;
+    overflow:hidden;
+    margin-bottom:18px;
+  }
+  .progressBarInner{
+    height:100%;
+    background:var(--accent);
+    transition:width 0.2s;
+  }
+  .qNum{
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    margin-bottom:6px;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
+  .qText{
+    font-size:18px;
+    font-weight:600;
+    line-height:1.5;
+    margin-bottom:20px;
+    color:var(--text);
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    margin-bottom:22px;
+  }
+  .option{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:14px 16px;
+    border:2px solid var(--border);
+    border-radius:12px;
+    cursor:pointer;
+    font-size:15.5px;
+    line-height:1.4;
+    background:#fff;
+    transition:border-color 0.12s, background 0.12s;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .option:active{ background:#f8fafc; }
+  .option.selected{
+    border-color:var(--accent);
+    background:#eff6ff;
+  }
+  .optLetter{
+    flex:0 0 auto;
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    background:#f1f5f9;
+    color:var(--muted);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:13px;
+  }
+  .option.selected .optLetter{
+    background:var(--accent);
+    color:#fff;
+  }
+
+  .navRow{
+    display:flex;
+    gap:10px;
+  }
+  .navRow button{
+    flex:1;
+  }
+  button.navBtn{
+    background:#f1f5f9;
+    color:var(--text);
+    border:none;
+    border-radius:12px;
+    padding:14px;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  button.navBtn:disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+  }
+
+  /* Result screen */
+  .scoreCircle{
+    width:140px;height:140px;
+    border-radius:50%;
+    background:conic-gradient(var(--accent) calc(var(--pct)*1%), #e2e8f0 0);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 20px;
+  }
+  .scoreCircle .inner{
+    width:112px;height:112px;
+    border-radius:50%;
+    background:#fff;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+  }
+  .scoreCircle .inner .big{ font-size:26px; font-weight:800; color:var(--text); }
+  .scoreCircle .inner .small{ font-size:12px; color:var(--muted); }
+
+  .statsRow{
+    display:flex;
+    justify-content:space-around;
+    margin:20px 0 8px;
+  }
+  .statsRow .stat{ text-align:center; }
+  .statsRow .stat .num{ font-size:20px; font-weight:800; }
+  .statsRow .stat .lbl{ font-size:12px; color:var(--muted); }
+  .statsRow .stat.correct .num{ color:var(--good); }
+  .statsRow .stat.wrong .num{ color:var(--danger); }
+  .statsRow .stat.skipped .num{ color:var(--muted); }
+
+  .hidden{ display:none !important; }
+
+  /* Review / Preview section */
+  .reviewHeading{
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    text-align:center;
+    margin:28px 0 12px;
+    letter-spacing:0.3px;
+  }
+  .reviewCard{
+    background:var(--card);
+    border-radius:14px;
+    padding:18px 18px 20px;
+    margin-bottom:14px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+  }
+  .reviewCard .qNum{
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .reviewCard .statusTag{
+    font-size:11px;
+    font-weight:700;
+    padding:2px 8px;
+    border-radius:20px;
+    text-transform:uppercase;
+  }
+  .statusTag.tagCorrect{ background:#dcfce7; color:var(--good); }
+  .statusTag.tagWrong{ background:#fee2e2; color:var(--danger); }
+  .statusTag.tagSkipped{ background:#f1f5f9; color:var(--muted); }
+
+  .option.correctOpt{
+    border-color:var(--good);
+    background:#f0fdf4;
+  }
+  .option.correctOpt .optLetter{
+    background:var(--good);
+    color:#fff;
+  }
+  .option.wrongOpt{
+    border-color:var(--danger);
+    background:#fef2f2;
+  }
+  .option.wrongOpt .optLetter{
+    background:var(--danger);
+    color:#fff;
+  }
+  .option.reviewOnly{
+    cursor:default;
+  }
+
+  .scrollHint{
+    margin-top:18px;
+    font-size:13px;
+    color:var(--accent);
+    font-weight:700;
+    animation: bounce 1.4s infinite;
+  }
+  @keyframes bounce{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(4px); }
+  }
+
+  .skipRow{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:-8px;
+    margin-bottom:14px;
+  }
+  .skipBtn{
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-size:13px;
+    font-weight:700;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:4px 2px;
+  }
+  .option.skippedOpt{
+    /* placeholder state, no option highlighted when skipped */
+  }
+  .skippedBadge{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    color:var(--muted);
+    background:#f1f5f9;
+    padding:3px 10px;
+    border-radius:20px;
+    margin-bottom:10px;
+  }
+
+  .endTestRow{
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .endTestLink{
+    background:rgba(239,68,68,0.12);
+    border:2px solid #ef4444;
+    color:#fca5a5;
+    font-size:14px;
+    font-weight:700;
+    border-radius:10px;
+    cursor:pointer;
+    padding:10px 16px;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .endTestLink:active{ background:rgba(239,68,68,0.3); }
+  #endModal{
+    position:fixed; inset:0; z-index:2000;
+    background:rgba(0,0,0,0.65);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px;
+  }
+  #endModal .box{
+    background:#fff; border-radius:16px; padding:24px 20px;
+    max-width:380px; width:100%; text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.4);
+  }
+  #endModal h3{ margin:0 0 10px; font-size:18px; color:var(--text); }
+  #endModal p{ margin:0 0 18px; font-size:14px; line-height:1.6; color:var(--muted); }
+  #endModal .danger{ background:var(--danger); color:#fff; border:none; border-radius:12px; padding:14px; font-size:16px; font-weight:700; width:100%; cursor:pointer; }
+  #endModal .cancel{ background:transparent; color:var(--accent); border:2px solid var(--accent); border-radius:12px; padding:12px; font-size:15px; font-weight:700; width:100%; margin-top:10px; cursor:pointer; }
+  .attemptInfo{margin-top:6px;font-size:14px;font-weight:700;color:var(--text);background:#f1f5f9;border-radius:10px;padding:10px;line-height:1.7;}
+  .filterRow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px;}
+  .filterBtn{border:2px solid #475569;background:transparent;color:#cbd5e1;border-radius:20px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;}
+  .filterBtn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+</style>
+</head>
+<body>
+
+<div id="timerBar">
+  <span class="clockIcon">⏱</span>
+  <span id="timeLeft">60:00</span>
+</div>
+<div id="timerProgressOuter"><div id="timerProgressInner"></div></div>
+
+<div class="wrap">
+
+  <!-- START SCREEN -->
+  <div id="startScreen" class="startCard">
+    <h1>Humanities & Critical Thinking — Practice Test</h1>
+    <p>150 sawalat, 1 ghanta (60 minute) ka waqt. Timer shuru hote he chalta rahega.</p>
+    <div id="resumeBox" class="hidden resumeBox">
+      <div class="resumeText" id="resumeText">Aapka pichla test adhoora hai.</div>
+      <button class="primary" id="resumeBtn">Resume Test</button>
+      <button class="secondary" id="discardBtn">Discard &amp; Start New</button>
+    </div>
+    <ul>
+      <li>⏱ Poora test 1 hour ka hai — timer hamesha upar show hoga.</li>
+      <li>➡️ Har page pr 10 sawal aayenge — sabhi 10 complete karein, phir <b>Next</b> se agle 10 pr jayein.</li>
+      <li>⏳ Waqt khatam ya 150 sawal mukammal hote he result aa jayega.</li>
+      <li>🔒 Kisi bhi option pr pehli dafa tap karne ke baad answer lock ho jata hai — dobara change nahi hoga.</li>
+      <li>⏹️ Beech mein rukna ho to <b>End Test</b> se abhi result dekh saktay hain.</li>
+      <li>💾 Site band ho jaye to bhi progress mehfooz rehta hai — wapis khol kar resume kar sakte hain.</li>
+      <li>🔁 Try Again se har baar naye order mein sawal aayenge.</li>
+    </ul>
+    <button class="primary" id="startBtn">Start Test</button>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div id="quizScreen" class="hidden">
+    <div class="progress" id="progressText">Questions 1–10 of 150</div>
+    <div class="progressBarOuter"><div class="progressBarInner" id="progressBar"></div></div>
+    <div class="endTestRow"><button class="endTestLink" id="endTestBtn">⏹ End Test &amp; See Result</button></div>
+
+    <div id="questionCards"></div>
+
+    <div class="navRow navRowSticky">
+      <button class="navBtn" id="prevBtn">Back</button>
+      <button class="primary" id="nextBtn">Next</button>
+    </div>
+  </div>
+
+  <!-- END TEST CONFIRM MODAL -->
+  <div id="endModal" class="hidden">
+    <div class="box">
+      <h3>Test khatam karein?</h3>
+      <p id="endModalText">Jo sawal answer nahi huay wo "Left" count honge.</p>
+      <button class="danger" id="endYesBtn">Haan, Result Dikhao</button>
+      <button class="cancel" id="endNoBtn">Nahi, Test Jaari Rakhein</button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="resultScreen" class="hidden resultCard">
+    <h1 id="resultTitle">Test Complete</h1>
+    <div class="scoreCircle" id="scoreCircle" style="--pct:0">
+      <div class="inner">
+        <div class="big" id="scorePct">0%</div>
+        <div class="small">Score</div>
+      </div>
+    </div>
+    <div class="statsRow">
+      <div class="stat correct"><div class="num" id="correctCount">0</div><div class="lbl">Correct</div></div>
+      <div class="stat wrong"><div class="num" id="wrongCount">0</div><div class="lbl">Wrong</div></div>
+      <div class="stat skipped"><div class="num" id="skippedCount">0</div><div class="lbl">Left</div></div>
+    </div>
+    <div class="attemptInfo" id="attemptInfo"></div>
+    <div class="scrollHint">⬇ Neechay scroll krein — poora answer review yahan hai ⬇</div>
+  </div>
+
+  <!-- REVIEW / PREVIEW SECTION -->
+  <div id="reviewSection" class="hidden">
+    <div class="reviewHeading">Full Answer Review</div>
+    <div class="filterRow" id="filterRow"></div>
+    <div id="reviewCards"></div>
+    <button class="primary" id="tryAgainBtn">Try Again</button>
+  </div>
+
+</div>
+
+<script>
+const MCQ_DATA = [{"q": "The center of the humanities is?", "o": ["Meaning, values, and interpretation", "Experiments and formulas", "Statistics and data", "Machines and technology"], "a": 0}, {"q": "Humanities mainly study?", "o": ["Human beings, thought, and creativity", "Chemical reactions", "Physical laws", "Mathematical formulas"], "a": 0}, {"q": "Science asks \"What is it?\"; humanities ask?", "o": ["Why and how?", "How much?", "When?", "Who invented it?"], "a": 0}, {"q": "Which pair correctly matches Science vs Humanities?", "o": ["Experiments/Facts vs Interpretation/Meanings", "Interpretation/Meanings vs Experiments/Facts", "Both use only experiments", "Both use only meanings"], "a": 0}, {"q": "\"How does rain symbolize in poetry?\" is a question of?", "o": ["Humanities", "Physics", "Medicine", "Chemistry"], "a": 0}, {"q": "\"Who should receive medicine first, and why?\" is mainly a ___ question", "o": ["Humanities (ethical)", "Chemical", "Biological", "Statistical"], "a": 0}, {"q": "How do humanities relate to science?", "o": ["Complement it by adding ethics and meaning", "Oppose it", "Replace it", "Are superior to it"], "a": 0}, {"q": "Which is NOT included in arts and humanities (lecture list)?", "o": ["Chemistry", "Philosophy", "Literature", "History"], "a": 0}, {"q": "\"Expressing emotions in Urdu versus English\" is an example of?", "o": ["Language", "Literature", "History", "Visual arts"], "a": 0}, {"q": "\"Reflection of resistance in Faiz's poetry\" is an example of?", "o": ["Literature", "History", "Language", "Philosophy"], "a": 0}, {"q": "\"Stories of Partition\" is an example of?", "o": ["History", "Literature", "Philosophy", "Visual arts"], "a": 0}, {"q": "\"Mughal architecture\" is an example of?", "o": ["Visual and performing arts", "Language", "Philosophy", "Media"], "a": 0}, {"q": "\"News headlines that shape perspectives\" falls under?", "o": ["Media and Communication", "History", "Philosophy", "Literature"], "a": 0}, {"q": "Which is a philosophy example question?", "o": ["What is the good life?", "What is rain?", "Which medicine works?", "What is H2O?"], "a": 0}, {"q": "Which key skill do the humanities develop?", "o": ["Critical thinking", "Memorizing formulas", "Solving equations", "Fast typing"], "a": 0}, {"q": "To identify fake news we ask: Who made this? What is their motive? And?", "o": ["What evidence supports this claim?", "How many likes does it have?", "Who shared it first?", "What colour is the post?"], "a": 0}, {"q": "Reading \"The Grapes of Wrath\" about poverty creates?", "o": ["Deeper awareness than statistics alone", "Distrust of statistics", "Hatred of science", "No effect"], "a": 0}, {"q": "Humanities promote ethics and?", "o": ["Empathy", "Competition", "Profit", "Speed"], "a": 0}, {"q": "A \"Critical Citizen\" is one who?", "o": ["Constructively questions authorities and policies", "Obeys without question", "Avoids politics", "Criticizes everything harshly"], "a": 0}, {"q": "An \"Ethical Decision-Maker\" does what?", "o": ["Considers consequences beyond personal benefit", "Thinks only of personal benefit", "Follows the majority", "Avoids decisions"], "a": 0}, {"q": "\"A society without humanity may become powerful — but it will not be ___\"", "o": ["humane", "rich", "stable", "educated"], "a": 0}, {"q": "The goal of the course, per the introduction, is to?", "o": ["Develop thinking skills rather than find the \"right\" answer", "Memorize facts", "Solve equations", "Only pass exams"], "a": 0}, {"q": "The learning goal of Lecture 3 is to recognize humanities as part of?", "o": ["Daily decision-making", "History dates", "Statistics", "Chemistry"], "a": 0}, {"q": "\"Whenever you choose, you are using ___\"", "o": ["humanities", "mathematics", "chemistry", "luck"], "a": 0}, {"q": "Ethics tells us what we ___ do", "o": ["should", "can", "did", "will"], "a": 0}, {"q": "Which belongs to \"Right vs Wrong\"?", "o": ["Telling truth vs lying", "Choosing clothing", "Music taste", "Design preferences"], "a": 0}, {"q": "\"Taste & Beauty\" includes?", "o": ["Choosing appropriate clothing", "Cheating", "Lying", "Standing up for fairness"], "a": 0}, {"q": "\"Communication Choices\" include?", "o": ["Soft words vs harsh tone", "Telling truth vs lying", "Choosing music", "Studying honestly"], "a": 0}, {"q": "Honesty in daily life means?", "o": ["Not cheating on exams or sharing false information", "Giving equal opportunities", "Avoiding prejudice", "Standing by your words"], "a": 0}, {"q": "Fairness means?", "o": ["Giving equal opportunities and avoiding bias", "Standing by your words", "Building trust only", "Not sharing news"], "a": 0}, {"q": "Responsibility means?", "o": ["Standing by words and actions and being mindful online", "Giving equal opportunities", "Not cheating only", "Following trends"], "a": 0}, {"q": "Art around us includes advertisements, architecture and?", "o": ["Social media visuals", "Only museums", "Only paintings", "Only books"], "a": 0}, {"q": "Advertisements combine?", "o": ["Persuasion with beauty", "Logic with maths", "Fear with force", "Data with charts"], "a": 0}, {"q": "Architecture as art includes?", "o": ["Homes, mosques, and universities", "Only palaces", "Only museums", "Only bridges"], "a": 0}, {"q": "Sharing unverified WhatsApp news involves which humanities aspects?", "o": ["Ethics, media literacy, responsibility", "Only grammar", "Only art", "Only statistics"], "a": 0}, {"q": "Copying a friend's assignment and submitting it is?", "o": ["Unethical", "Ethical", "Neutral", "Smart"], "a": 0}, {"q": "Group discussion format in the lecture: group size?", "o": ["4–5 students", "2 students", "10 students", "Whole class"], "a": 0}, {"q": "Mini discussion question: Do we control media, or?", "o": ["Does media control us?", "Does art control us?", "Does science control us?", "Does family control us?"], "a": 0}, {"q": "Art is?", "o": ["Creative expression conveying ideas, emotions, experiences", "Only painting", "Only beauty", "A scientific law"], "a": 0}, {"q": "In art, imagination discovers connections among things that are?", "o": ["Different and even contradictory", "Identical", "Scientific", "Measured"], "a": 0}, {"q": "The three categories of art are?", "o": ["Visual, Literary, Performing", "Visual, Musical, Chemical", "Literary, Scientific, Social", "Performing, Social, Natural"], "a": 0}, {"q": "Truck art, calligraphy and photography are?", "o": ["Visual art", "Literary art", "Performing art", "Natural science"], "a": 0}, {"q": "Poetry, novels, short stories and plays are?", "o": ["Literary art", "Visual art", "Performing art", "Media"], "a": 0}, {"q": "Drama, dance, theatre and live music are?", "o": ["Performing art", "Visual art", "Literary art", "Graphic design"], "a": 0}, {"q": "A sad poem is?", "o": ["Also art", "Not art", "Bad art", "Science"], "a": 0}, {"q": "Art is born from?", "o": ["Society", "Isolation", "Machines", "Laws"], "a": 0}, {"q": "Art shapes society by?", "o": ["Challenging norms and sparking dialogue", "Only copying it", "Hiding truth", "Avoiding change"], "a": 0}, {"q": "Culture is?", "o": ["The shared way of life that defines communities and identity", "An individual habit", "Art only", "Law"], "a": 0}, {"q": "Which is NOT an element of culture in the lecture?", "o": ["Chemistry formulas", "Beliefs", "Traditions", "Rituals"], "a": 0}, {"q": "Eid, Basant and Milad are examples of?", "o": ["Rituals", "Language", "Clothing", "Values"], "a": 0}, {"q": "Pakistani cultural value example is hospitality; Western example is?", "o": ["Punctuality", "Hospitality", "Silence", "Tradition"], "a": 0}, {"q": "Art is the ___ of society", "o": ["mirror", "enemy", "master", "servant"], "a": 0}, {"q": "Art reflects politics, religion, class and?", "o": ["History", "Chemistry", "Biology", "Mathematics"], "a": 0}, {"q": "Partition literature shows?", "o": ["Stories and trauma of the 1947 migration", "Royal court life", "Family systems", "Truck humour"], "a": 0}, {"q": "Mughal paintings show?", "o": ["Royal culture, court life, imperial power", "Partition trauma", "TV family systems", "Protest"], "a": 0}, {"q": "TV dramas show?", "o": ["Family systems, gender roles, social pressure", "Royal courts", "Partition", "Revolutions only"], "a": 0}, {"q": "Steps to read an artwork: Identify the message, Consider the audience, and?", "o": ["Connect it to society", "Count its colours", "Sell it", "Copy it"], "a": 0}, {"q": "Resistance literature is writing against?", "o": ["Oppression, injustice, authoritarianism", "Beauty", "Peace", "Culture"], "a": 0}, {"q": "Protest art includes?", "o": ["Graffiti, posters, murals", "Only poems", "Only dramas", "Only music"], "a": 0}, {"q": "Faiz Ahmed Faiz blended love with?", "o": ["Revolution", "War", "Science", "Trade"], "a": 0}, {"q": "Truck art expresses?", "o": ["Identity, joy, and pride in everyday life", "War", "Fear", "Only politics"], "a": 0}, {"q": "How many elements of visual composition are taught?", "o": ["Six", "Four", "Five", "Eight"], "a": 0}, {"q": "Which is NOT one of the six building blocks?", "o": ["Rhythm", "Points", "Lines", "Texture"], "a": 0}, {"q": "Points are?", "o": ["Small areas of interest", "Paths for the eye", "3D forms", "Surface quality"], "a": 0}, {"q": "Points have ___, drawing the viewer's eye", "o": ["gravity", "speed", "volume", "echo"], "a": 0}, {"q": "Lines are?", "o": ["Paths for the eye or boundaries", "Enclosed 2D areas", "3D representations", "Warm colours"], "a": 0}, {"q": "An imaginary line example is?", "o": ["Space between a child and a toy truck", "A curved road", "A mountain ridge", "A cloud's edge"], "a": 0}, {"q": "Shapes are?", "o": ["Flat 2D enclosed areas", "3D representations", "Paths", "Single dots"], "a": 0}, {"q": "A circle feels?", "o": ["Peaceful", "Dynamic", "Evocative", "Aggressive"], "a": 0}, {"q": "A triangle feels?", "o": ["Dynamic", "Peaceful", "Calm", "Evocative"], "a": 0}, {"q": "Forms are?", "o": ["3D representations of an object", "2D areas", "Lines", "Points"], "a": 0}, {"q": "Form transforms a flat circle into a?", "o": ["Sphere", "Pyramid", "Square", "Line"], "a": 0}, {"q": "Form transforms a triangle into a?", "o": ["Pyramid", "Sphere", "Cube", "Circle"], "a": 0}, {"q": "Texture as the subject example?", "o": ["Patterns in sand or waves of water", "Filling spaces", "Warm colours", "A single dot"], "a": 0}, {"q": "Too much texture in unimportant areas can?", "o": ["Distract", "Add drama", "Be required", "Make calm"], "a": 0}, {"q": "Warm colours are?", "o": ["Red, orange, yellow", "Green, blue, violet", "Black, white", "Grey"], "a": 0}, {"q": "Cool colours are?", "o": ["Green, blue, violet", "Red, orange", "Yellow only", "Orange only"], "a": 0}, {"q": "A vivid red dot against blue appears?", "o": ["Closer to the viewer", "Farther away", "The same", "Invisible"], "a": 0}, {"q": "Removing colour (black & white) emphasizes?", "o": ["Form, texture, and light", "Warm colours", "Warm–cool contrast", "Saturation"], "a": 0}, {"q": "The three great pillars of knowledge are?", "o": ["Natural Science, Social Science, Humanities & Arts", "Physics, Chemistry, Biology", "Art, Music, Drama", "Maths, Logic, Ethics"], "a": 0}, {"q": "Natural science seeks?", "o": ["Laws governing the physical universe", "Patterns of behaviour", "Meanings", "Beauty"], "a": 0}, {"q": "Natural science method is?", "o": ["Hypothesis-driven research and reproducible experiments", "Interpretation", "Storytelling", "Debate"], "a": 0}, {"q": "Which is NOT a natural science discipline?", "o": ["Sociology", "Physics", "Biology", "Astronomy"], "a": 0}, {"q": "Social science decodes?", "o": ["Patterns of human behaviour and social structures", "Physical laws", "Poetry", "Paintings"], "a": 0}, {"q": "Sociology studies?", "o": ["Social structures, institutions, group dynamics", "Cultures across geography", "Resources", "Power and governance"], "a": 0}, {"q": "Anthropology studies?", "o": ["Human cultures across time and geography", "Resources", "Governance", "Group structures"], "a": 0}, {"q": "Economics studies?", "o": ["Production, distribution, consumption of resources", "Power", "Culture", "Language"], "a": 0}, {"q": "Political science studies?", "o": ["Power, governance, political systems", "Resources", "Cultures", "Atoms"], "a": 0}, {"q": "Humanities interpret?", "o": ["The meaning of the human condition", "Atoms", "Markets only", "Equations"], "a": 0}, {"q": "Where science asks how, humanities ask?", "o": ["Why", "What", "When", "Where"], "a": 0}, {"q": "Humanities study things by?", "o": ["Analyzing components and joining them into a big picture", "Analyzing components only", "Experiments only", "Ignoring components"], "a": 0}, {"q": "Arts are always about finding?", "o": ["Subjective meanings", "Objective laws", "Experiments", "Statistics"], "a": 0}, {"q": "Humanities sometimes use objective tools like?", "o": ["Social sciences", "Chemistry", "Physics", "Astronomy"], "a": 0}, {"q": "The output of natural science is?", "o": ["Predictive models", "Behavioural theories", "Interpretation and insight", "Poems"], "a": 0}, {"q": "The output of social science is?", "o": ["Behavioural theories", "Predictive models", "Interpretation and insight", "Poems"], "a": 0}, {"q": "\"Philosophy as the mother of all inquiry\" belongs to which period?", "o": ["Ancient roots", "18th century", "19th century", "Modern era"], "a": 0}, {"q": "The Enlightenment and ___ set empirical standards in the 18th century", "o": ["positivism", "romanticism", "mysticism", "idealism"], "a": 0}, {"q": "The word philosophy means?", "o": ["Love of wisdom", "Love of power", "Fear of truth", "Study of nature"], "a": 0}, {"q": "Philo and sophia mean?", "o": ["Love and wisdom", "Truth and logic", "Mind and soul", "Reason and faith"], "a": 0}, {"q": "Philosophy is Systematic, Critical and?", "o": ["Reflective", "Emotional", "Experimental", "Random"], "a": 0}, {"q": "Which is NOT a fundamental philosophical question?", "o": ["What is profit?", "What is reality?", "What can we know?", "How should we live?"], "a": 0}, {"q": "Philosophy marks a transition from?", "o": ["Mythos to logos", "Logos to mythos", "Faith to doubt", "Art to science"], "a": 0}, {"q": "Thales asked about?", "o": ["The basic substance of the universe", "Ethics", "Logic", "Beauty"], "a": 0}, {"q": "Socrates shifted focus to?", "o": ["Ethical questions and self-knowledge", "Substance of the universe", "Physics", "Branches of philosophy"], "a": 0}, {"q": "Plato and Aristotle?", "o": ["Systematized inquiry into branches", "Founded the Socratic method", "Asked about basic substance", "Rejected philosophy"], "a": 0}, {"q": "The Socratic method teaches through?", "o": ["Questioning", "Lecturing", "Memorizing", "Experiments"], "a": 0}, {"q": "In the Socratic method, wisdom begins with?", "o": ["Ignorance", "Certainty", "Wealth", "Power"], "a": 0}, {"q": "Physics originated as?", "o": ["Natural philosophy", "Mind and soul studies", "Justice and governance", "Meaning and logic"], "a": 0}, {"q": "Psychology originated as?", "o": ["Mind and soul studies", "Natural philosophy", "Justice and governance", "Meaning and logic"], "a": 0}, {"q": "Political science originated from?", "o": ["Justice and governance", "Mind studies", "Natural philosophy", "Language"], "a": 0}, {"q": "Philosophy teaches us how to think, not?", "o": ["What to think", "Why to think", "When to think", "Where to think"], "a": 0}, {"q": "Concepts with deep philosophical roots include?", "o": ["Democracy, justice, human rights, equality", "Only democracy", "Chemistry", "Mathematics"], "a": 0}, {"q": "Philosophy at its core is?", "o": ["A way of life grounded in questioning and reasoning", "Only an academic subject", "Memorization", "Blind belief"], "a": 0}, {"q": "The four branches of philosophy are?", "o": ["Metaphysics, Epistemology, Axiology, Logic", "Ethics, Aesthetics, Logic, Politics", "Physics, Ethics, Logic, Art", "Metaphysics, Ethics, Biology, Logic"], "a": 0}, {"q": "Metaphysics asks?", "o": ["What is real?", "What can we know?", "What is good?", "What is valid?"], "a": 0}, {"q": "Which is a metaphysical question?", "o": ["Does God exist? Mind–body relationship?", "What is beauty?", "Is this argument valid?", "What are the sources of knowledge?"], "a": 0}, {"q": "Epistemology is the?", "o": ["Theory of knowledge", "Study of value", "Study of reality", "Mechanics of reasoning"], "a": 0}, {"q": "Rationalism says knowledge comes from?", "o": ["Reason and logic", "Senses", "Faith", "Authority"], "a": 0}, {"q": "Empiricism says knowledge comes from?", "o": ["Sensory experience and observation", "Innate ideas", "Reason alone", "Revelation"], "a": 0}, {"q": "Rationalists named in the lecture?", "o": ["Descartes, Plato", "Locke, Hume", "Socrates, Thales", "Aristotle, Kant"], "a": 0}, {"q": "Empiricists named in the lecture?", "o": ["Locke, Hume", "Descartes, Plato", "Plato, Aristotle", "Thales, Socrates"], "a": 0}, {"q": "Axiology is the study of?", "o": ["Value", "Reality", "Knowledge", "Reasoning"], "a": 0}, {"q": "Axiology includes?", "o": ["Ethics and aesthetics", "Logic and epistemology", "Metaphysics", "Rationalism"], "a": 0}, {"q": "Aesthetics explores?", "o": ["Beauty, taste, artistic value", "Right and wrong", "Reality", "Arguments"], "a": 0}, {"q": "Logic provides?", "o": ["Formal tools to evaluate arguments", "Beauty", "Reality", "Moral values"], "a": 0}, {"q": "Ethics determines?", "o": ["What is right, wrong, praiseworthy", "Beauty", "Reality", "Knowledge"], "a": 0}, {"q": "Reasoning is?", "o": ["A systematic process of using facts and logic to reach valid conclusions", "Guessing", "An emotional reaction", "Memorizing"], "a": 0}, {"q": "Deductive reasoning applies?", "o": ["General rules to specific cases", "Specific observations to general rules", "Probabilities", "Guesses"], "a": 0}, {"q": "Deduction gives?", "o": ["Certainty (if premises are true)", "Probability", "Possibility", "Doubt"], "a": 0}, {"q": "Induction gives?", "o": ["Probability", "Certainty", "Guaranteed truth", "Validity"], "a": 0}, {"q": "Induction moves from?", "o": ["Specific to general", "General to specific", "Top to bottom", "None of these"], "a": 0}, {"q": "All humans are mortal; Socrates is human; therefore?", "o": ["Socrates is mortal", "Socrates is wise", "All mortals are human", "Socrates is immortal"], "a": 0}, {"q": "Parts of a standard deductive argument?", "o": ["Major premise, minor premise, conclusion", "Claim, evidence", "Observation, pattern", "Rule, guess"], "a": 0}, {"q": "\"The sun rose yesterday and today, so it will likely rise tomorrow\" is?", "o": ["Inductive reasoning", "Deductive reasoning", "A fallacy", "Ad hominem"], "a": 0}, {"q": "Memory device: Deduction =?", "o": ["DOWN", "UP", "SIDE", "ROUND"], "a": 0}, {"q": "Memory device: Induction =?", "o": ["UP", "DOWN", "FLAT", "BACK"], "a": 0}, {"q": "Words like 'all' or 'every' suggest?", "o": ["Deduction", "Induction", "A fallacy", "An opinion"], "a": 0}, {"q": "The word 'observed' suggests?", "o": ["Induction", "Deduction", "A fallacy", "A syllogism"], "a": 0}, {"q": "A logical fallacy is?", "o": ["An error in reasoning that undermines validity", "A true argument", "Evidence", "A fact"], "a": 0}, {"q": "Ad hominem is?", "o": ["Attacking the person instead of the argument", "Distorting an argument", "Offering only two options", "Appealing to popularity"], "a": 0}, {"q": "\"You cannot trust Ahmed's opinion because he is a poor student\" is?", "o": ["Ad hominem", "Straw man", "False dilemma", "Hasty generalization"], "a": 0}, {"q": "Straw man is?", "o": ["Misrepresenting an argument to make it easier to attack", "Attacking the person", "Offering only two options", "Using a small sample"], "a": 0}, {"q": "\"We should reduce homework\" → \"So you think students should never study!\" is?", "o": ["Straw man", "Ad hominem", "False dilemma", "Induction"], "a": 0}, {"q": "A false dilemma is?", "o": ["Presenting only two options when more exist", "Distorting an argument", "Attacking a person", "Using a small sample"], "a": 0}, {"q": "\"Either you support this policy or you don't care about the country\" is?", "o": ["False dilemma", "Straw man", "Ad hominem", "Deduction"], "a": 0}, {"q": "Hasty generalization is?", "o": ["A broad claim based on a small sample", "Attacking a person", "Offering two options", "Distorting an argument"], "a": 0}, {"q": "The flaw of appeal to popularity?", "o": ["Popularity is not a measure of truth", "Small sample", "Distortion", "Personal attack"], "a": 0}, {"q": "The critical thinking checklist has how many questions?", "o": ["Five", "Three", "Four", "Seven"], "a": 0}, {"q": "In the \"How to View or Read a Work of Art\" activity, students work in groups of?", "o": ["3–4 students", "4–5 students", "2 students", "8–10 students"], "a": 0}, {"q": "Teacher's note for analysing artworks: art is open to?", "o": ["Different meanings and multiple interpretations", "Only one correct meaning", "Only the artist's meaning", "Only the teacher's meaning"], "a": 0}];
+</script>
+<script>
+(function(){
+  const TOTAL_TIME = 60 * 60; // seconds
+  const PAGE_SIZE = 10;
+  const STORAGE_KEY = 'humanities_mcq_test_state_v1';
+
+  let questions = [];
+  let currentPage = 0;
+  let totalPages = 1;
+  let userAnswers = [];
+  let timeRemaining = TOTAL_TIME;
+  let testEndTime = null; // absolute timestamp (ms) when the test should end
+  let timerInterval = null;
+  let testActive = false;
+
+  const startScreen = document.getElementById('startScreen');
+  const quizScreen = document.getElementById('quizScreen');
+  const resultScreen = document.getElementById('resultScreen');
+  const reviewSection = document.getElementById('reviewSection');
+  const reviewCards = document.getElementById('reviewCards');
+  const timerBar = document.getElementById('timerBar');
+  const timeLeftEl = document.getElementById('timeLeft');
+  const timerProgressInner = document.getElementById('timerProgressInner');
+
+  const progressText = document.getElementById('progressText');
+  const progressBar = document.getElementById('progressBar');
+  const questionCards = document.getElementById('questionCards');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const endTestBtn = document.getElementById('endTestBtn');
+
+  const startBtn = document.getElementById('startBtn');
+  const tryAgainBtn = document.getElementById('tryAgainBtn');
+  const resumeBox = document.getElementById('resumeBox');
+  const resumeText = document.getElementById('resumeText');
+  const resumeBtn = document.getElementById('resumeBtn');
+  const discardBtn = document.getElementById('discardBtn');
+
+  // ---- Persistence (localStorage) ----
+  function saveState(){
+    if(!testActive) return;
+    try{
+      const state = { questions, userAnswers, currentPage, testEndTime, testActive };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){ /* storage unavailable - fail silently, test still works in-memory */ }
+  }
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+
+  function clearState(){
+    try{ localStorage.removeItem(STORAGE_KEY); }catch(e){ /* ignore */ }
+  }
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // Build a fresh randomized question set: shuffle question order AND
+  // shuffle each question's option order (so answer_index is remapped).
+  function buildQuestionSet(){
+    const shuffledQs = shuffle(MCQ_DATA);
+    return shuffledQs.map(item => {
+      const optIdx = [0,1,2,3];
+      const shuffledOptIdx = shuffle(optIdx);
+      const newOptions = shuffledOptIdx.map(i => item.o[i]);
+      const newAnswer = shuffledOptIdx.indexOf(item.a);
+      return { q: item.q, o: newOptions, a: newAnswer };
+    });
+  }
+
+  function formatTime(sec){
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  }
+
+  function tick(){
+    timeRemaining = Math.max(0, Math.round((testEndTime - Date.now()) / 1000));
+    updateTimerDisplay();
+    if(timeRemaining <= 0){
+      clearInterval(timerInterval);
+      finishTest();
+    }
+  }
+
+  function startTimer(){
+    clearInterval(timerInterval);
+    tick();
+    timerInterval = setInterval(tick, 1000);
+  }
+
+  function updateTimerDisplay(){
+    const remaining = Math.max(timeRemaining, 0);
+    timeLeftEl.textContent = formatTime(remaining);
+    const pct = Math.max(0, Math.min(100, (remaining / TOTAL_TIME) * 100));
+    timerProgressInner.style.width = pct + '%';
+    timerBar.classList.remove('warn','danger');
+    if(remaining <= 60){
+      timerBar.classList.add('danger');
+    } else if(remaining <= 300){
+      timerBar.classList.add('warn');
+    }
+  }
+
+  function startTest(resumeState){
+    if(resumeState){
+      questions = resumeState.questions;
+      userAnswers = resumeState.userAnswers;
+      currentPage = resumeState.currentPage;
+      testEndTime = resumeState.testEndTime;
+    } else {
+      questions = buildQuestionSet();
+      userAnswers = new Array(questions.length).fill(null);
+      currentPage = 0;
+      testEndTime = Date.now() + TOTAL_TIME * 1000;
+    }
+    totalPages = Math.ceil(questions.length / PAGE_SIZE);
+    testActive = true;
+
+    startScreen.classList.add('hidden');
+    resultScreen.classList.add('hidden');
+    reviewSection.classList.add('hidden');
+    quizScreen.classList.remove('hidden');
+
+    saveState();
+    startTimer();
+    renderPage();
+  }
+
+  function pageBounds(page){
+    const start = page * PAGE_SIZE;
+    const end = Math.min(start + PAGE_SIZE, questions.length);
+    return {start, end};
+  }
+
+  function renderPage(){
+    const total = questions.length;
+    const {start, end} = pageBounds(currentPage);
+    const letters = ['A','B','C','D'];
+
+    progressText.textContent = `Questions ${start+1}–${end} of ${total}`;
+    progressBar.style.width = (end/total*100) + '%';
+
+    questionCards.innerHTML = '';
+    for(let i = start; i < end; i++){
+      const q = questions[i];
+      const card = document.createElement('div');
+      card.className = 'qCard';
+
+      const numDiv = document.createElement('div');
+      numDiv.className = 'qNum';
+      numDiv.textContent = 'Q' + (i+1);
+      card.appendChild(numDiv);
+
+      const textDiv = document.createElement('div');
+      textDiv.className = 'qText';
+      textDiv.textContent = q.q;
+      card.appendChild(textDiv);
+
+      if(userAnswers[i] === 'skipped'){
+        const badge = document.createElement('div');
+        badge.className = 'skippedBadge';
+        badge.textContent = 'Skipped — tap an option to answer';
+        card.appendChild(badge);
+      }
+
+      const optsDiv = document.createElement('div');
+      optsDiv.className = 'options';
+      q.o.forEach((optText, idx) => {
+        const opt = document.createElement('div');
+        opt.className = 'option';
+        if(userAnswers[i] === idx) opt.classList.add('selected');
+        opt.innerHTML = `<span class="optLetter">${letters[idx]}</span><span>${escapeHtml(optText)}</span>`;
+        const locked = (typeof userAnswers[i] === 'number');
+        if(locked) opt.style.cursor = 'default';
+        opt.addEventListener('click', () => {
+          // Answer lock: pehli dafa tap ke baad answer change nahi hoga
+          if(typeof userAnswers[i] === 'number') return;
+          userAnswers[i] = idx;
+          saveState();
+          renderPage();
+        });
+        optsDiv.appendChild(opt);
+      });
+      card.appendChild(optsDiv);
+
+      const skipRow = document.createElement('div');
+      skipRow.className = 'skipRow';
+      const skipBtn = document.createElement('button');
+      skipBtn.className = 'skipBtn';
+      skipBtn.textContent = (userAnswers[i] === 'skipped') ? 'Skipped' : 'Skip this question';
+      if(typeof userAnswers[i] === 'number'){ skipBtn.style.display = 'none'; }
+      skipBtn.addEventListener('click', () => {
+        if(typeof userAnswers[i] === 'number') return; // already answered - locked
+        userAnswers[i] = 'skipped';
+        saveState();
+        renderPage();
+      });
+      skipRow.appendChild(skipBtn);
+      card.appendChild(skipRow);
+
+      questionCards.appendChild(card);
+    }
+
+    prevBtn.disabled = (currentPage === 0);
+
+    const pageComplete = isPageComplete(currentPage);
+    nextBtn.disabled = !pageComplete;
+    nextBtn.textContent = (currentPage === totalPages - 1) ? 'Finish' : 'Next';
+  }
+
+  function isPageComplete(page){
+    const {start, end} = pageBounds(page);
+    for(let i = start; i < end; i++){
+      if(userAnswers[i] === null || userAnswers[i] === undefined) return false;
+    }
+    return true;
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function goNext(){
+    if(!isPageComplete(currentPage)) return;
+    if(currentPage < totalPages - 1){
+      currentPage++;
+      saveState();
+      renderPage();
+      window.scrollTo({top:0, behavior:'instant'});
+    } else {
+      finishTest();
+    }
+  }
+
+  function goPrev(){
+    if(currentPage > 0){
+      currentPage--;
+      saveState();
+      renderPage();
+      window.scrollTo({top:0, behavior:'instant'});
+    }
+  }
+
+  function finishTest(){
+    if(!testActive) return;
+    testActive = false;
+    clearInterval(timerInterval);
+    clearState();
+
+    let correct = 0, wrong = 0, skipped = 0;
+    questions.forEach((q, i) => {
+      const ans = userAnswers[i];
+      if(ans === null || ans === undefined || ans === 'skipped'){
+        skipped++;
+      } else if(ans === q.a){
+        correct++;
+      } else {
+        wrong++;
+      }
+    });
+
+    const total = questions.length;
+    const pct = Math.round((correct/total)*100);
+
+    document.getElementById('correctCount').textContent = correct;
+    document.getElementById('wrongCount').textContent = wrong;
+    document.getElementById('skippedCount').textContent = skipped;
+    document.getElementById('scorePct').textContent = pct + '%';
+    document.getElementById('scoreCircle').style.setProperty('--pct', pct);
+
+    startScreen.classList.add('hidden');
+    quizScreen.classList.add('hidden');
+    resultScreen.classList.remove('hidden');
+    timerBar.classList.remove('warn','danger');
+
+    document.getElementById('attemptInfo').innerHTML =
+      `Attempt kiye: <b>${correct+wrong}</b> / ${total}<br>` +
+      `<span style="color:var(--good)">Sahi: ${correct}</span> &nbsp;|&nbsp; <span style="color:var(--danger)">Ghalat: ${wrong}</span><br>` +
+      `<span style="color:var(--muted)">Left (chhoray huay): ${skipped}</span>`;
+    reviewFilter = 'all';
+    renderReview();
+  }
+
+  let reviewFilter = 'all';
+  function statusOf(i){
+    const a = userAnswers[i];
+    if(a === null || a === undefined || a === 'skipped') return 'left';
+    return a === questions[i].a ? 'correct' : 'wrong';
+  }
+  function renderFilters(){
+    const row = document.getElementById('filterRow');
+    const c = {all:questions.length, correct:0, wrong:0, left:0};
+    questions.forEach((q,i)=>{ c[statusOf(i)]++; });
+    const names = {all:'All', correct:'Sahi', wrong:'Ghalat', left:'Left'};
+    row.innerHTML = '';
+    Object.keys(names).forEach(k=>{
+      const b = document.createElement('button');
+      b.className = 'filterBtn' + (reviewFilter===k ? ' active' : '');
+      b.textContent = names[k] + ' (' + c[k] + ')';
+      b.addEventListener('click', ()=>{ reviewFilter = k; renderReview(); });
+      row.appendChild(b);
+    });
+  }
+  function renderReview(){
+    renderFilters();
+    const letters = ['A','B','C','D'];
+    reviewCards.innerHTML = '';
+
+    questions.forEach((q, i) => {
+      if(reviewFilter !== 'all' && statusOf(i) !== reviewFilter) return;
+      const userIdx = userAnswers[i];
+      const isSkipped = (userIdx === null || userIdx === undefined || userIdx === 'skipped');
+      const isCorrect = (!isSkipped && userIdx === q.a);
+
+      const card = document.createElement('div');
+      card.className = 'reviewCard';
+
+      const numRow = document.createElement('div');
+      numRow.className = 'qNum';
+      const tagClass = isSkipped ? 'tagSkipped' : (isCorrect ? 'tagCorrect' : 'tagWrong');
+      const tagText = isSkipped ? 'Left' : (isCorrect ? 'Correct' : 'Wrong');
+      numRow.innerHTML = `<span>Q${i+1}</span><span class="statusTag ${tagClass}">${tagText}</span>`;
+      card.appendChild(numRow);
+
+      const textDiv = document.createElement('div');
+      textDiv.className = 'qText';
+      textDiv.textContent = q.q;
+      card.appendChild(textDiv);
+
+      const optsDiv = document.createElement('div');
+      optsDiv.className = 'options';
+      q.o.forEach((optText, idx) => {
+        const opt = document.createElement('div');
+        opt.className = 'option reviewOnly';
+        if(idx === q.a){
+          opt.classList.add('correctOpt');
+        } else if(idx === userIdx){
+          opt.classList.add('wrongOpt');
+        }
+        opt.innerHTML = `<span class="optLetter">${letters[idx]}</span><span>${escapeHtml(optText)}</span>`;
+        optsDiv.appendChild(opt);
+      });
+      card.appendChild(optsDiv);
+
+      reviewCards.appendChild(card);
+    });
+
+    reviewSection.classList.remove('hidden');
+  }
+
+  startBtn.addEventListener('click', () => startTest());
+  tryAgainBtn.addEventListener('click', () => startTest());
+  nextBtn.addEventListener('click', goNext);
+  prevBtn.addEventListener('click', goPrev);
+
+  const endModal = document.getElementById('endModal');
+  const endModalText = document.getElementById('endModalText');
+  endTestBtn.addEventListener('click', () => {
+    const answered = userAnswers.filter(a => typeof a === 'number').length;
+    const left = questions.length - answered;
+    endModalText.textContent = 'Aap ne ' + answered + ' sawal attempt kiye hain, ' + left + ' abhi baaqi hain. Baaqi sawal "Left" count honge.';
+    endModal.classList.remove('hidden');
+  });
+  document.getElementById('endNoBtn').addEventListener('click', () => {
+    endModal.classList.add('hidden');
+  });
+  document.getElementById('endYesBtn').addEventListener('click', () => {
+    endModal.classList.add('hidden');
+    finishTest();
+    window.scrollTo({top:0, behavior:'instant'});
+  });
+
+  discardBtn.addEventListener('click', () => {
+    clearState();
+    resumeBox.classList.add('hidden');
+  });
+
+  // ---- Resume-on-load: check for an in-progress test saved in this browser ----
+  (function initResume(){
+    const saved = loadState();
+    if(!saved || !saved.testActive || !Array.isArray(saved.questions)){
+      return;
+    }
+    const remainingMs = saved.testEndTime - Date.now();
+    if(remainingMs <= 0){
+      // Time was already up while the site was closed - jump straight to the result.
+      questions = saved.questions;
+      userAnswers = saved.userAnswers;
+      testActive = true;
+      finishTest();
+      return;
+    }
+    const answeredCount = saved.userAnswers.filter(a => a !== null && a !== undefined).length;
+    resumeText.textContent = `Aapka pichla test adhoora hai — ${answeredCount} / ${saved.questions.length} sawal ho chukay hain. Waqt baaqi: ${formatTime(Math.round(remainingMs/1000))}.`;
+    resumeBox.classList.remove('hidden');
+    resumeBtn.addEventListener('click', () => startTest(saved));
+  })();
+
+  updateTimerDisplay();
+})();
+</script>
+
+</body>
+</html>
